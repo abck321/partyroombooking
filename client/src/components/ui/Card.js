@@ -11,13 +11,13 @@ export default function BasicCard({partyRoom}) {
     <Card sx={{ minWidth: 275 }}>
       <CardContent>
         <Typography variant="h5" gutterBottom>
-          {partyRoom.name}
+          Party Room Name: {partyRoom.name}
         </Typography>
         <Typography sx={{ fontSize: 14 }} color="text.secondary" component="div">
-          {partyRoom.location}
+          Location: {partyRoom.location}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
-          {partyRoom.description}
+          Description: {partyRoom.description}
         </Typography>
       </CardContent>
       <CardActions>
