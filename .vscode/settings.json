@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/5af1e6ee-0912-4745-9077-4140ac7f2023/resourceGroups/partyroombooking/providers/Microsoft.Web/sites/partyroombooking",
+    "appService.deploySubpath": "server\\bin\\Publish"
+}
