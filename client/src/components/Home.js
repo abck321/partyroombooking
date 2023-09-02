@@ -7,6 +7,7 @@ import axios from 'axios';
 
 import SearchBar from "./ui/SearchBar";
 import BasicCard from './ui/Card';
+import DatabaseLoading from './ui/DatabaseLoading';
 
 const getPartyRoomList = async (partyRoomData) => {
     const res = await axios.post(`${API_BASE_URL}/partyroom/list`, partyRoomData);
@@ -17,6 +18,7 @@ const Home = ({isAuthenticated}) => {
     const [username, setUsername] = useState("");
     const [mounted, setMounted] = useState(false);
     const [partyRooms, setPartyRooms] = useState([]);
+    const [connecting, setConnecting] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -28,6 +30,7 @@ const Home = ({isAuthenticated}) => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setConnecting(true);
             const partyRoomData = {
                 keyword: "",
                 date: "",
@@ -35,6 +38,7 @@ const Home = ({isAuthenticated}) => {
             };
             const res = await getPartyRoomList(partyRoomData);
             setPartyRooms(res.data);
+            setConnecting(false);
         };
         
         fetchData();
@@ -79,7 +83,7 @@ const Home = ({isAuthenticated}) => {
                     <BasicCard key={partyRoom.partyRoomId} partyRoom={partyRoom}/>
                 ))
             ):(
-                <div>No party room found.</div>
+                connecting ? <DatabaseLoading loadingString="Searching Party Rooms" /> : <div>No party room found.</div>
             )}
             
         </div>
