@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useState, useEffect } from 'react';
@@ -11,11 +10,6 @@ import Login from './Login';
 import Register from './Register'
 import PartyRoomBooking from './PartyRoomBooking'
 import NotFound from './NotFound'
-
-const StyledNav = styled.nav`
-  display: flex;
-  justify-content: space-between;
-`;
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,12 +31,14 @@ const Navbar = () => {
 
   return ( 
     <BrowserRouter>
-      <StyledNav>
-        <Link to="/">Home</Link>
-        <Link to="/myappointment">My appointment</Link>
-        {!isAuthenticated && <Link to="/login">Login</Link>}
-        {isAuthenticated && <Link onClick={handleLogout}>Logout</Link>}
-      </StyledNav>
+      <nav>
+        <menu>
+        <Link to="/"><li><div className='abc'>Home</div></li></Link>
+        <Link to="/myappointment"><li><div className='abc'>My appointment</div></li></Link>
+        {!isAuthenticated && <Link to="/login"><li><div className='abc'>Login</div></li></Link>}
+        {isAuthenticated && <Link onClick={handleLogout}><li><div className='abc'>Logout</div></li></Link>}
+        </menu>
+      </nav>
       <Routes>
         <Route path="/" element={<Home isAuthenticated={isAuthenticated}/>} />
         <Route path="/myappointment" element={<MyAppointment isAuthenticated={isAuthenticated}/>} />

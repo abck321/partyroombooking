@@ -1,38 +1,106 @@
-.App {
-  text-align: center;
+menu {
+  border-radius: 3px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+menu:after,
+menu:before {
+  display: block;
+  content: " ";
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+menu:after {
+  clear: both;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+li {
+  list-style-type: none;
+  background: linear-gradient(
+    rgba(220, 220, 255, 0.4) 85%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+
+  float: left;
+  cursor: pointer;
+  padding: 3px 10px;
+  border-top: 2px solid rgba(200, 200, 255, 0.5);
+  border-bottom: 2px solid rgba(50, 50, 50, 0.4);
 }
 
-.App-link {
-  color: #61dafb;
+li:first-child {
+  border-radius: 5px 0 0 5px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+li:last-child {
+  border-radius: 0 5px 5px 0;
+}
+
+.abc {
+  display: block;
+  padding: 10px 13px;
+  font-size: 15px;
+  text-decoration: none;
+  border-radius: 5px;
+  position: relative;
+  top: 0;
+  transition: all 0.4s;
+}
+
+li:hover .abc {
+  top: -20px;
+  color: #4eacff;
+  background-color: #fff;
+  box-shadow: 0 0 5px 0 rgba(255, 255, 255, 0.7);
+  transition: all 0.4s;
+}
+
+li .abc:after {
+  display: block;
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 42%;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 5px 5px 0 5px;
+  transition: all 0.4s;
+}
+
+li:hover a:after {
+  border-color: white transparent transparent transparent;
+  transition: all 0.4s;
+}
+
+/*************************************/
+
+.menu2 {
+  width: 350px;
+}
+
+.menu2 a {
+  font-family: georgia;
+  font-size: 14px;
+  font-style: italic;
+  text-transform: capitalize;
+}
+
+.menu2 li {
+  border-right: 1px solid rgba(200, 200, 255, 0.5);
+  border-left: 1px solid rgba(40, 40, 40, 0.2);
+}
+
+.selected {
+  top: -20px;
+  color: #4eacff;
+  background-color: #fff;
+  box-shadow: 0 0 5px 0 rgba(255, 255, 255, 0.7);
+  transition: all 0.4s;
+}
+
+.selected:after {
+  border-color: white transparent transparent transparent;
+  transition: all 0.4s;
+}
+
+a.fun {
+  display: none;
 }
