@@ -82,13 +82,14 @@ export default class Calendar extends React.Component {
         this.props.onMonthChange && this.props.onMonthChange();
 
     }
+    
     SelectList = (props) => {
         let popup = props.data.map((data) => {
             return (
                 <div key={data}>
-                    <a href="#" onClick={(e)=> {this.onSelectChange(e, data)}}>
+                    <span onClick={(e)=> {this.onSelectChange(e, data)}}>
                         {data}
-                    </a>
+                    </span>
                 </div>
             );
         });
