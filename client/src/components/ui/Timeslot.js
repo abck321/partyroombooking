@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { Button, Checkbox } from "@mui/material";
+import DatabaseLoading from './DatabaseLoading';
 
 const timeslots = [
     { label: "00:00 to 01:00", startTime: "00:00", endTime: "01:00" },
@@ -38,10 +39,9 @@ const timeslots = [
 ];
 
 
-const Timeslot = ({ partyRoomId, selectedDate, isAuthenticated }) => {
+const Timeslot = ({ partyRoomId, selectedDate, isAuthenticated, loading, setLoading }) => {
     const [checkedList, setCheckedList] = useState([]);
     const [disabledList, setDisabledList] = useState([]);
-    const [loading, setLoading] = useState(false);
 
     const [userId, setUserId] = useState("");
     const [mounted, setMounted] = useState(false);
@@ -137,6 +137,7 @@ const Timeslot = ({ partyRoomId, selectedDate, isAuthenticated }) => {
                         const updatedDisabledList = timeslots.filter((_, index) => results[index]);
                         
                         setDisabledList(updatedDisabledList);
+                        
                     };
                     
                     fetchData();
@@ -153,22 +154,27 @@ const Timeslot = ({ partyRoomId, selectedDate, isAuthenticated }) => {
         <div>
             <h3>Selected Date: {selectedDate}</h3>
             <h5>Available timeslots:</h5>
-            <FormGroup row>
-                {timeslots.map((timeslot) => (
-                    <FormControlLabel
-                    key={timeslot.startTime}
-                    control={
-                        <Checkbox
-                        checked={checkedList.includes(timeslot)}
-                        onChange={(e) => handleCheckboxChange(timeslot, e.target.checked)}
-                        />
-                    }
-                    label={timeslot.label}
-                    disabled={disabledList.includes(timeslot)}
-                    />
-                ))}
-            </FormGroup>
-            {isAuthenticated ? <Button onClick={handleBooking} disabled={loading}>Book now</Button> : <Link to="/login"><Button>Login to book</Button></Link>}
+            {loading && <DatabaseLoading loadingString="Loading Timeslots" />}
+            {!loading &&
+                <div>
+                    <FormGroup row>
+                        {timeslots.map((timeslot) => (
+                            <FormControlLabel
+                            key={timeslot.startTime}
+                            control={
+                                <Checkbox
+                                checked={checkedList.includes(timeslot)}
+                                onChange={(e) => handleCheckboxChange(timeslot, e.target.checked)}
+                                />
+                            }
+                            label={timeslot.label}
+                            disabled={disabledList.includes(timeslot)}
+                            />
+                        ))}
+                    </FormGroup>
+                    {isAuthenticated ? <Button onClick={handleBooking} disabled={loading}>Book now</Button> : <Link to="/login"><Button>Login to book</Button></Link>}
+                </div>
+            }
         </div>
     );
 };

@@ -16,6 +16,8 @@ const PartyRoomBooking = ({ isAuthenticated }) => {
     const [partyRoomData, setPartyRoomData] = useState("");
     const [isError, setIsError] = useState(false);
     const [selectedDate, setSelectedDate] = useState("");
+    const [loading, setLoading] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -53,8 +55,8 @@ const PartyRoomBooking = ({ isAuthenticated }) => {
             <div>Location: {partyRoomData.location}</div>
             <div>Description: {partyRoomData.description}</div>
             <div>PartyRoomCalendar</div>
-            <Calendar partyRoomId={id} onButtonClick={handleButtonClick}/>
-            {selectedDate && <Timeslot partyRoomId={id} selectedDate={selectedDate} isAuthenticated={isAuthenticated}/>}
+            <Calendar partyRoomId={id} onButtonClick={handleButtonClick} loading={loading}/>
+            {selectedDate && <Timeslot partyRoomId={id} selectedDate={selectedDate} isAuthenticated={isAuthenticated} loading={loading} setLoading={setLoading}/>}
         </div>
      );
 }

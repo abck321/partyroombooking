@@ -79,28 +79,25 @@ tr {
   padding: 0.3em;
 }
 
-.nav-month {
-  position: absolute;
-  top: 0.6em;
-  font-size: 0.6em;
-  right: 3px;
-}
-
-.prev {
-}
-
-.next {
-}
-
 .editor-year {
   max-width: 3.6em;
 }
 
-.label-month,
 .label-year {
   font-size: 0.6em;
+  width: 3.6em;
 }
 
 .label-month {
+  font-size: 0.6em;
+  width: 5.4em;
+  cursor: pointer;
+}
+
+.prev-month-next-year-selector {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
 }

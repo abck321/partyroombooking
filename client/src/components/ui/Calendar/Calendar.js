@@ -1,183 +1,54 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 import './Calendar.css';
 import { API_BASE_URL } from '../../../config'
 
 import { Button } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+const Calendar = ({partyRoomId, onButtonClick, loading}) => {
+    const width = "700px";
 
-export default class Calendar extends React.Component {
-    state = {
-        dateContext: moment(),
-        today: moment(),
-        showMonthPopup: false,
-        showYearPopup: false,
-        selectedDay: null,
-        isLoading: false
-    }
+    const [dateContext, setDataContext] = useState(moment());    
+    const [showMonthPopup, setShowMonthPopup] = useState(false);
+    const [showYearNav, setShowYearNav] = useState(false);
+    const month = dateContext.format("MMMM");
+    const year = dateContext.format("Y");
+    const weekdaysShort = moment.weekdaysShort();
 
-    constructor(props) {
-        super(props);
-        this.width = props.width || "700px";
-        this.style = props.style || {};
-        this.style.width = this.width; // add this
-    }
-
-
-    weekdays = moment.weekdays(); //["Sunday", "Monday", "Tuesday", "Wednessday", "Thursday", "Friday", "Saturday"]
-    weekdaysShort = moment.weekdaysShort(); // ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-    months = moment.months();
-
-    year = () => {
-        return this.state.dateContext.format("Y");
-    }
-    month = () => {
-        return this.state.dateContext.format("MMMM");
-    }
-    daysInMonth = () => {
-        return this.state.dateContext.daysInMonth();
-    }
-    currentDate = () => {
-        return this.state.dateContext.get("date");
-    }
-    currentDay = () => {
-        return this.state.dateContext.format("D");
-    }
-
-    firstDayOfMonth = () => {
-        let dateContext = this.state.dateContext;
-        let firstDay = moment(dateContext).startOf('month').format('d'); // Day of week 0...1..5...6
-        return firstDay;
-    }
-
-    setMonth = (month) => {
-        let monthNo = this.months.indexOf(month);
-        let dateContext = Object.assign({}, this.state.dateContext);
-        dateContext = moment(dateContext).set("month", monthNo);
-        this.setState({
-            dateContext: dateContext
-        });
-    }
-
-    nextMonth = () => {
-        let dateContext = Object.assign({}, this.state.dateContext);
-        dateContext = moment(dateContext).add(1, "month");
-        this.setState({
-            dateContext: dateContext
-        });
-        this.props.onNextMonth && this.props.onNextMonth();
-    }
-
-    prevMonth = () => {
-        let dateContext = Object.assign({}, this.state.dateContext);
-        dateContext = moment(dateContext).subtract(1, "month");
-        this.setState({
-            dateContext: dateContext
-        });
-        this.props.onPrevMonth && this.props.onPrevMonth();
-    }
-
-    onSelectChange = (e, data) => {
-        this.setMonth(data);
-        this.props.onMonthChange && this.props.onMonthChange();
-
+    const months = moment.months();
+    
+    const onChangeMonth = (e, month) => {
+        setShowMonthPopup(!showMonthPopup);
     }
     
-    SelectList = (props) => {
-        let popup = props.data.map((data) => {
-            return (
-                <div key={data}>
-                    <span onClick={(e)=> {this.onSelectChange(e, data)}}>
-                        {data}
-                    </span>
-                </div>
-            );
-        });
-
-        return (
-            <div className="month-popup">
-                {popup}
-            </div>
-        );
+    const onSelectChange = (e, data) => {
+        setDataContext(moment(dateContext).set("month", months.indexOf(data)));
     }
 
-    onChangeMonth = (e, month) => {
-        this.setState({
-            showMonthPopup: !this.state.showMonthPopup
-        });
+    const prevMonth = () => {
+        setDataContext(moment(dateContext).subtract(1, "month"));
     }
 
-    MonthNav = () => {
-        return (
-            <span className="label-month"
-                onClick={(e)=> {this.onChangeMonth(e, this.month())}}>
-                {this.month()}
-                {this.state.showMonthPopup &&
-                 <this.SelectList data={this.months} />
-                }
-            </span>
-        );
+    const nextMonth = () => {
+        setDataContext(moment(dateContext).add(1, "month"));
     }
 
-    showYearEditor = () => {
-        this.setState((prevState) => ({
-            showYearNav: !prevState.showYearNav
-        }));
-    }
-
-    setYear = (year) => {
-        let dateContext = Object.assign({}, this.state.dateContext);
-        dateContext = moment(dateContext).set("year", year);
-        this.setState({
-            dateContext: dateContext
-        })
-    }
-    onYearChange = (e) => {
-        this.setYear(e.target.value);
-        this.props.onYearChange && this.props.onYearChange(e, e.target.value);
-    }
-
-    onKeyUpYear = (e) => {
+    const onKeyUpYear = (e) => {
         if (e.which === 13 || e.which === 27) {
-            this.setYear(e.target.value);
-            this.setState({
-                showYearNav: false
-            })
+            setDataContext(moment(dateContext).set("year", e.target.value));
+            setShowYearNav(false);
         }
     }
-
-    YearNav = () => {
-        return (
-            this.state.showYearNav ?
-            <input
-                defaultValue = {this.year()}
-                className="editor-year"
-                ref={(yearInput) => { this.yearInput = yearInput}}
-                onKeyUp= {(e) => this.onKeyUpYear(e)}
-                onChange = {(e) => this.onYearChange(e)}
-                type="number"
-                placeholder="year"
-            />
-            :
-            <span
-                className="label-year"
-                onClick={(e)=> { this.showYearEditor()}}>
-                {this.year()}
-            </span>
-        );
+    const onYearChange = (e) => {
+        setDataContext(moment(dateContext).set("year", e.target.value));
+    }
+    
+    const showYearEditor = () => {
+        setShowYearNav(!showYearNav);
     }
 
-    onDayClick = (e, day) => {
-        this.setState({
-            selectedDay: day
-        }, () => {
-            console.log(moment(this.state.dateContext).format("YYYY-MM")+ "-" + String(this.state.selectedDay).padStart(2, '0'));
-        });
-
-        this.props.onDayClick && this.props.onDayClick(e, day);
-    }
-
-    handleButtonDisabled = async (partyRoomId, date) => {
+    const handleButtonDisabled = async (partyRoomId, date) => {
         const partyRoomData = {
             partyRoomId,
             date,
@@ -186,106 +57,126 @@ export default class Calendar extends React.Component {
         return res.data;
     }
 
-    render() {
-        // Map the weekdays i.e Sun, Mon, Tue etc as <td>
-        let weekdays = this.weekdaysShort.map((day) => {
-            return (
-                <td key={day} className="week-day">{day}</td>
-            )
-        });
+    const firstDayOfMonth = () => {
+        let firstDay = moment(dateContext).startOf('month').format('d'); // Day of week 0...1..5...6
+        return firstDay;
+    }
 
-        let blanks = [];
-        for (let i = 0; i < this.firstDayOfMonth(); i++) {
-            blanks.push(<td key={i * 80} className="emptySlot">
-                {""}
-                </td>
-            );
+    let blanks = [];
+    for (let i = 0; i < firstDayOfMonth(); i++) {
+        blanks.push(<td key={i * 80} className="emptySlot">
+            {""}
+            </td>
+        );
+    }
+
+    let daysInMonth = [];
+    for (let d = 1; d <= dateContext.daysInMonth(); d++) {
+        daysInMonth.push(
+            <td key={d} className="day" >
+                <div>{d}</div>
+                <PromiseRender
+                    promise={handleButtonDisabled(partyRoomId, moment(dateContext).format("YYYY-MM") + "-" + String(d).padStart(2, '0'))} 
+                    day={d}
+                    currentDate={moment(dateContext.currentDate).format("YYYY-MM-DD")}
+                    buttonDate={moment(dateContext).format("YYYY-MM") + "-" + String(d).padStart(2, '0')}
+                    onButtonClick={onButtonClick}
+                    loading={loading}
+                />
+            </td>
+        );
+    }
+    
+    const totalSlots = [...blanks, ...daysInMonth];
+    let rows = [];
+    let cells = [];
+
+    totalSlots.forEach((row, i) => {
+        if ((i % 7) !== 0) {
+            cells.push(row);
+        } else {
+            let insertRow = cells.slice();
+            rows.push(insertRow);
+            cells = [];
+            cells.push(row);
         }
-
-        let daysInMonth = [];
-        for (let d = 1; d <= this.daysInMonth(); d++) {
-            daysInMonth.push(
-                <td key={d} className={"day"} >
-                    <div>{d}</div>
-                    <PromiseRender
-                        promise={this.handleButtonDisabled(this.props.partyRoomId, moment(this.state.dateContext).format("YYYY-MM") + "-" + String(d).padStart(2, '0'))} 
-                        day={d}
-                        currentDate={moment(this.state.dateContext.currentDate).format("YYYY-MM-DD")}
-                        buttonDate={moment(this.state.dateContext).format("YYYY-MM") + "-" + String(d).padStart(2, '0')}
-                        onButtonClick={this.props.onButtonClick}
-                    />
-                </td>
-            );
+        if (i === totalSlots.length - 1) {
+            let insertRow = cells.slice();
+            rows.push(insertRow);
         }
+    });
 
-        const totalSlots = [...blanks, ...daysInMonth];
-        let rows = [];
-        let cells = [];
-
-        totalSlots.forEach((row, i) => {
-            if ((i % 7) !== 0) {
-                cells.push(row);
-            } else {
-                let insertRow = cells.slice();
-                rows.push(insertRow);
-                cells = [];
-                cells.push(row);
-            }
-            if (i === totalSlots.length - 1) {
-                let insertRow = cells.slice();
-                rows.push(insertRow);
-            }
-        });
-        
-        let trElems = rows.map((d, i) => {
-            
-            return (
-                <tr key={i*100}>
-                    {d}
-                </tr>
-            );
-        })
-
-        return (
-            <div className="calendar-container" style={this.style}>
-                <table className="calendar">
+    return (
+        <div className="calendar-container" style={ {width:width} }>
+            <table className="calendar">
                     <thead>
                         <tr className="calendar-header">
-                            <td colSpan="5">
-                                <this.MonthNav />
-                                {" "}
-                                <this.YearNav />
-                            </td>
-                            <td colSpan="2" className="nav-month">
-                                <i className="prev fa fa-fw fa-chevron-left"
-                                    onClick={(e)=> {this.prevMonth()}}>
-                                </i>
-                                <i className="prev fa fa-fw fa-chevron-right"
-                                    onClick={(e)=> {this.nextMonth()}}>
-                                </i>
-
+                            <td colSpan="7">
+                                <div className='prev-month-next-year-selector'>
+                                    <i className="prev-icon"
+                                        onClick={(e)=> {prevMonth()}}>
+                                            <ArrowBackIcon/>
+                                    </i>
+                                    <span className="label-month" onClick={(e)=> {onChangeMonth(e, month)}}>
+                                        {month}
+                                        {showMonthPopup &&
+                                            <div className="month-popup">
+                                                {months.map((month) => (
+                                                    <span key={month}>
+                                                        <div onClick={(e) => onSelectChange(e, month)}>
+                                                            {month}
+                                                        </div>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        }
+                                    </span>
+                                    <i className="next-icon"
+                                        onClick={(e)=> {nextMonth()}}>
+                                            <ArrowBackIcon style={{transform: "scaleX(-1)"}}/>
+                                    </i>
+                                    {" "}
+                                    {showYearNav ?
+                                        <input
+                                            defaultValue = {year}
+                                            className="editor-year"
+                                            onKeyUp= {(e) => onKeyUpYear(e)}
+                                            onChange = {(e) => onYearChange(e)}
+                                            type="number"
+                                            placeholder="year"
+                                        />
+                                        :
+                                        <span
+                                            className="label-year"
+                                            onClick={(e)=> { showYearEditor()}}>
+                                            {year}
+                                        </span>}
+                                </div>
                             </td>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            {weekdays}
+                            {weekdaysShort.map((day)=> (
+                                <td key={day} className="week-day">{day}</td>
+                            ))}
                         </tr>
-                        {trElems}
+                        {rows.map((d, i) =>(
+                            <tr key={i*100}>
+                                {d}
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
-
-            </div>
-
-        );
-    }
+        </div>
+    )
 }
 
-const PromiseRender = ({ promise, day, currentDate, buttonDate, onButtonClick }) => {
-    const [buttonDisabled, setButtonDisabled] = React.useState(null);
+const PromiseRender = ({ promise, day, currentDate, buttonDate, onButtonClick, loading }) => {
+    const [buttonDisabled, setButtonDisabled] = useState(null);
     const currentDateFormat = new Date(currentDate);
     const buttonDateFormat = new Date(buttonDate);
-    React.useEffect(() => {
+    useEffect(() => {
       let isMounted = true;
       promise.then((result) => {
         if (isMounted) {
@@ -307,6 +198,8 @@ const PromiseRender = ({ promise, day, currentDate, buttonDate, onButtonClick })
     return currentDateFormat <= buttonDateFormat ? (buttonDisabled ? (
         <Button disabled={true}>Fully Booked</Button>
     ) : (
-      <Button onClick={() => onButtonClick(buttonDate)}>Select</Button>
+      <Button disabled={loading} onClick={() => onButtonClick(buttonDate)}>Select</Button>
     )) : <Button disabled={true}>Date passed</Button>;
 };
+
+export default Calendar;
